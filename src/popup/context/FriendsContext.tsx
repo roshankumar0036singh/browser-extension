@@ -8,20 +8,37 @@ interface Friend {
   displayName?: string;
   isOnline?: boolean;
   lastSeen?: string;
+  activeTab?: { title: string; url: string };
+  allTabs?: { id: number; title: string; url: string }[];
+}
+
+interface ActiveTab {
+  title: string;
+  url: string;
+}
+
+interface Tab {
+  id: number;
+  title: string;
+  url: string;
 }
 
 interface FriendsContextType {
   friends: Friend[];
   loading: boolean;
   refresh: () => void;
+  activeTabs: Record<string, ActiveTab | undefined>;
+  allTabs: Record<string, Tab[] | undefined>;
 }
 
 const FriendsContext = createContext<FriendsContextType | undefined>(undefined);
 
-export const FriendsProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
+export const FriendsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   const [friends, setFriends] = useState<Friend[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTabs, setActiveTabs] = useState<Record<string, ActiveTab>>({});
+  const [allTabs, setAllTabs] = useState<Record<string, Tab[]>>({});
 
   const loadFriends = async () => {
     if (!user) return;
@@ -29,18 +46,69 @@ export const FriendsProvider: React.FC<{children: React.ReactNode}> = ({ childre
     try {
       const res = await fetchFriendsWithStatus(user.token);
       setFriends(res.data || []);
+      // Set initial tab data for online friends
+      const initialActiveTabs: Record<string, ActiveTab> = {};
+      const initialAllTabs: Record<string, Tab[]> = {};
+      (res.data || []).forEach((f: Friend) => {
+        if (f.isOnline && f.activeTab) {
+          initialActiveTabs[f.id] = f.activeTab;
+        }
+        if (f.isOnline && Array.isArray(f.allTabs)) {
+          initialAllTabs[f.id] = f.allTabs;
+        }
+      });
+      setActiveTabs(initialActiveTabs);
+      setAllTabs(initialAllTabs);
     } catch {
       setFriends([]);
+      setActiveTabs({});
+      setAllTabs({});
     }
     setLoading(false);
   };
+
+  function handleFriendMessage(message: any) {
+    if (message.type === 'FRIEND_ACTIVE_TAB_UPDATE') {
+      const { friendId, data } = message.payload;
+      if (friendId && data?.tab) {
+        setActiveTabs(prev => ({
+          ...prev,
+          [friendId]: {
+            title: data.tab.title,
+            url: data.tab.url,
+          }
+        }));
+      }
+    }
+
+    if (message.type === 'FRIEND_TAB_UPDATE') {
+      const { friendId, data } = message.payload;
+      if (friendId && Array.isArray(data?.tabs)) {
+        setAllTabs(prev => ({
+          ...prev,
+          [friendId]: data.tabs.map((tab: any) => ({
+            id: tab.id,
+            title: tab.title,
+            url: tab.url,
+          })),
+        }));
+      }
+    }
+  }
 
   useEffect(() => {
     loadFriends();
   }, [user]);
 
+  useEffect(() => {
+    chrome.runtime.onMessage.addListener(handleFriendMessage);
+    return () => {
+      chrome.runtime.onMessage.removeListener(handleFriendMessage);
+    };
+  }, []);
+
   return (
-    <FriendsContext.Provider value={{ friends, loading, refresh: loadFriends }}>
+    <FriendsContext.Provider value={{ friends, loading, refresh: loadFriends, activeTabs, allTabs }}>
       {children}
     </FriendsContext.Provider>
   );

@@ -49,8 +49,28 @@ export async function initializeWebSocket() {
                 console.warn('[WebSocket] Auth failed, closing connection...');
                 ws?.close();
             }
+
+            if (data.type === 'friend_tab_update') {
+                // console.log('[WebSocket-extension] Received friend tab update:', data);
+                chrome.runtime.sendMessage({
+                    type: 'FRIEND_TAB_UPDATE',
+                    payload: data
+                }).catch((e) => {
+                    console.warn('[WebSocket-extension] Error sending FRIEND_TAB_UPDATE message:', e);
+                });
+            }
+
+            if (data.type === 'friend_active_tab_update') {
+                console.log('[WebSocket-extension] Received friend active tab update:', data);
+                chrome.runtime.sendMessage({
+                    type: 'FRIEND_ACTIVE_TAB_UPDATE',
+                    payload: data
+                }).catch((e) => {
+                    console.warn('[WebSocket-extension] Error sending FRIEND_ACTIVE_TAB_UPDATE message:', e);
+                });
+            }
         } catch (error) {
-            console.error('[WebSocket] Invalid Message format: ', error);
+            console.error('[WebSocket-extension] Invalid Message format: ', error);
         }
     }
 
@@ -76,4 +96,8 @@ export function closeWebSocket() {
     }
     ws = null;
   }
+}
+
+export function getWebSocket() {
+    return ws;
 }
