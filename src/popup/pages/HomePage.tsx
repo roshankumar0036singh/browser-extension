@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { FriendsProvider } from '../context/FriendsContext';
 import { WelcomeScreen } from '../components/welcome';
-import { DashboardHeader, FriendsList, StatusPanel } from '../components/dashboard';
+import { DashboardHeader } from '../components/dashboard';
 import FriendsTabs from '../components/dashboard/FriendsTabs';
+import AnalyticsPanel from '../components/analytics/AnalyticsPanel';
 
 const HomePage: React.FC = () => {
   const { user, loading, logout } = useAuth();
-  const [privacyLevel, setPrivacyLevel] = useState<'public' | 'friends-only' | 'anonymous' | 'off'>('friends-only');
+  const [showAnalytics, setShowAnalytics] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -16,11 +17,6 @@ const HomePage: React.FC = () => {
 
   const handleRefresh = () => {
     window.location.reload();
-  };
-
-  const handlePrivacyChange = (level: 'public' | 'friends-only' | 'anonymous' | 'off') => {
-    setPrivacyLevel(level);
-    console.log('Privacy level changed to:', level);
   };
 
   if (loading) {
@@ -37,16 +33,28 @@ const HomePage: React.FC = () => {
 
   return (
     <FriendsProvider>
-      <div className="min-h-[600px] w-[400px] bg-white p-6 flex flex-col h-full">
-        <DashboardHeader
-          username={user.username}
-          displayName={user.displayName}
-          onRefresh={handleRefresh}
-          onLogout={handleLogout}
-        />
-        
-        <FriendsTabs />
-        
+      <div className="min-h-[600px] w-[400px] bg-white flex flex-col h-[600px]">
+        {/* Header is fixed at the top */}
+        <div className="sticky top-0 z-10 bg-white p-6 pb-2">
+          <DashboardHeader
+            username={user.username}
+            displayName={user.displayName}
+            onRefresh={handleRefresh}
+            onLogout={handleLogout}
+            onAnalytics={() => setShowAnalytics(true)}
+            showBack={showAnalytics}
+            onBack={() => setShowAnalytics(false)}
+            isAnalytics={showAnalytics}
+          />
+        </div>
+        {/* Main content scrolls inside the popup */}
+        <div className="flex-1 overflow-y-auto px-6 pb-6">
+          {showAnalytics ? (
+            <AnalyticsPanel />
+          ) : (
+            <FriendsTabs />
+          )}
+        </div>
       </div>
     </FriendsProvider>
   );

@@ -136,3 +136,10 @@ export const fetchUserProfile = async (username: string, token: string) => {
   });
   return await res.json();
 };
+
+export const fetchWeeklyTabUsage = async (token: string) => {
+  const res = await fetch(`${BACKEND_URL}/api/analytics/tab-usage/weekly`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return await res.json();
+};
