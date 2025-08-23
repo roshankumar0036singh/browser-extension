@@ -205,6 +205,61 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   }, [user, loadConversations, loadMessages]);
 
+  
+  // Handle incoming messages via WebSocket
+  const handleIncomingMessage = useCallback((message: Message) => {
+    setMessages(prev => {
+      const existingMessages = prev[message.conversationId] || [];
+      
+      // Check if message already exists to prevent duplicates
+      const messageExists = existingMessages.some(msg => msg.id === message.id);
+      if (messageExists) {
+        return prev;
+      }
+      
+      return {
+        ...prev,
+        [message.conversationId]: [ ...existingMessages, { ...message, status: 'delivered' }]
+      };
+    });
+    
+    // Update conversation last message and unread count
+    setConversations(prev => prev.map(conv => 
+      conv.conversation.id === message.conversationId 
+        ? {
+            ...conv,
+            conversation: {
+              ...conv.conversation,
+              lastMessage: message
+            },
+            unreadCount: message.senderId !== user?.id ? conv.unreadCount + 1 : conv.unreadCount
+          }
+        : conv
+    ));
+  }, [user]);
+
+  useEffect(() => {
+    const handleWebSocketMessage = (message: any) => {
+      console.log('MessageContext: WebSocket message received:', message.type);
+      
+      switch (message.type) {
+        case 'NEW_MESSAGE':
+          handleIncomingMessage(message.payload);
+          break;
+        default:
+          console.log('MessageContext: Unknown WebSocket message type:', message.type);
+      }
+    };
+
+    chrome.runtime.onMessage.addListener(handleWebSocketMessage);
+    return () => {
+      chrome.runtime.onMessage.removeListener(handleWebSocketMessage);
+    };
+  }, [
+    handleIncomingMessage, 
+    loadConversations
+  ]);
+
   useEffect(() => {
     if (user) {
         loadConversations();

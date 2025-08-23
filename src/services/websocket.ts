@@ -75,6 +75,16 @@ export async function initializeWebSocket() {
                     console.warn('[WebSocket-extension] Error sending FRIEND_ACTIVE_TAB_UPDATE message:', e);
                 });
             }
+
+            if (data.type === 'NEW_MESSAGE') {
+                console.log('[WebSocket-extension] Received new message:', data);
+                chrome.runtime.sendMessage({
+                    type: 'NEW_MESSAGE',
+                    payload: data.data
+                }).catch((e) => {
+                    console.warn('[WebSocket-extension] Error sending NEW_MESSAGE message:', e);
+                });
+            }
         } catch (error) {
             console.error('[WebSocket-extension] Invalid Message format: ', error);
         }
