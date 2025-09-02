@@ -62,7 +62,7 @@ interface MessageContextType {
   loading: boolean;
   pendingCount: number;
   loadConversations: () => Promise<void>;
-  loadMessages: (conversationId: string) => Promise<void>;
+  loadMessages: (conversationId: string, markAsSeen: boolean) => Promise<void>;
   sendMessage: (data: {
     conversationId?: string;
     receiverId?: string;
@@ -74,6 +74,7 @@ interface MessageContextType {
     data?: any;
     message?: string;
   }>;
+  markAsSeen: (conversationId: string, force?: boolean) => Promise<void>;
   acceptMessageRequest: (conversationId: string) => Promise<void>;
   rejectMessageRequest: (conversationId: string) => Promise<void>;
 }
@@ -104,11 +105,11 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [user]);
 
-  const loadMessages = useCallback(async (conversationId: string) => {
+  const loadMessages = useCallback(async (conversationId: string, markAsSeen = false) => {
     if (!user) return;
 
     try {
-      const response = await getConversationMessages(conversationId, user.token);
+      const response = await getConversationMessages(conversationId, user.token, 50, undefined, true);
       if (response.success) {
         setMessages(prevMessages => ({
           ...prevMessages,
@@ -116,11 +117,19 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }));
 
         console.log(`Loaded messages for conversation ${conversationId}`, response.data);
+        
+        if (markAsSeen) {
+          setConversations(prev => prev.map(conv => 
+            conv.conversation.id === conversationId 
+              ? { ...conv, unreadCount: 0 }
+              : conv
+          ));
+        }
       }
     } catch (error) {
       console.error('Error loading messages:', error);
     }
-  }, [user]);
+  }, [user, messages]);
 
   const sendMessage = useCallback(async (data: { conversationId?: string; receiverId?: string; content: string }) => {
     if (!user) return { success: false, message: "User not authenticated" };
@@ -206,6 +215,98 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
 
   }, [user, loadConversations, loadMessages]);
+
+
+  // Simplified markAsSeen function using the optimized backend
+  const markAsSeen = useCallback(async (conversationId: string, force: boolean = false) => {
+    if (!user) return;
+    
+    try {
+      const conversationMessages = messages[conversationId] || [];
+      const conversation = conversations.find(c => c.conversation.id === conversationId);
+      
+      if (!conversation) {
+        console.log('MessageContext: Conversation not found for markAsSeen');
+        return;
+      }
+
+      const conversationType = conversation.conversation.type;
+      
+      // Check if there are any unread messages from others
+      const unreadMessages = conversationMessages.filter(msg => 
+        msg.senderId !== user.id && (
+          conversationType === 'DIRECT' 
+            ? !msg.seenAt
+            : (!msg.readBy || !msg.readBy.some((receipt: any) => receipt.user.id === user.id))
+        )
+      );
+      
+      // Only call API if there are unread messages or forced
+      if (unreadMessages.length === 0 && !force) {
+        console.log('MessageContext: No unread messages to mark as seen');
+        return;
+      }
+      
+      console.log('MessageContext: Marking conversation as seen:', conversationId, 'Type:', conversationType, 'Unread count:', unreadMessages.length);
+      
+      const { markConversationAsSeen } = await import('../../services/api');
+      const response = await markConversationAsSeen(conversationId, user.token);
+      
+      if (response.success) {
+        const seenAt = response.seenAt || new Date().toISOString();
+        
+        // Update local state based on conversation type
+        setMessages(prev => ({
+          ...prev,
+          [conversationId]: (prev[conversationId] || []).map(msg => {
+            if (msg.senderId === user.id) return msg; // Don't update own messages
+            
+            if (conversationType === 'DIRECT') {
+              // For direct conversations, update seenAt field
+              return {
+                ...msg,
+                seenAt: !msg.seenAt ? seenAt : msg.seenAt,
+                status: 'seen' // Simplified status model
+              };
+            } else {
+              // For group conversations, update readBy array
+              const hasUserRead = msg.readBy?.some((receipt: any) => receipt.user.id === user.id);
+              if (!hasUserRead) {
+                return {
+                  ...msg,
+                  readBy: [
+                    ...(msg.readBy || []),
+                    {
+                      user: {
+                        id: user.id,
+                        username: user.username || '',
+                        displayName: user.displayName || user.username || '',
+                      },
+                      readAt: seenAt
+                    }
+                  ],
+                  status: 'seen'
+                };
+              }
+            }
+            
+            return msg;
+          })
+        }));
+        
+        // Reset unread count
+        setConversations(prev => prev.map(conv => 
+          conv.conversation.id === conversationId 
+            ? { ...conv, unreadCount: 0 }
+            : conv
+        ));
+        
+        console.log('MessageContext: Conversation marked as seen successfully');
+      }
+    } catch (error) {
+      console.error('MessageContext: Error marking conversation as seen:', error);
+    }
+  }, [user, messages, conversations]);
 
   const acceptMessageRequest = useCallback(async (conversationId: string) => {
     if (!user) return;
@@ -304,6 +405,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({ child
         loadMessages,
         pendingCount,
         sendMessage,
+        markAsSeen,
         acceptMessageRequest,
         rejectMessageRequest
     }}>

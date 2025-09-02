@@ -209,10 +209,11 @@ export const getUserConversations = async (token: string) => {
   return await response.json();
 };
 
-export const getConversationMessages = async (conversationId: string, token: string, limit = 50, cursor?: string) => {
+export const getConversationMessages = async (conversationId: string, token: string, limit = 50, cursor?: string, markAsSeen = false) => {
   const params = new URLSearchParams({ limit: String(limit) });
   if (cursor) params.append('cursor', cursor);
-  
+  if (markAsSeen) params.append('markAsSeen', 'true');
+
   const response = await fetch(`${BACKEND_URL}/api/conversation/${conversationId}/messages?${params}`, {
     headers: { Authorization: `Bearer ${token}` }
   });
@@ -282,6 +283,29 @@ export const startConversation = async (receiverId: string, token: string) => {
     return {
       success: false,
       error: 'Failed to check existing conversations'
+    };
+  }
+};
+
+export const markConversationAsSeen = async (conversationId: string, token: string) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/conversation/${conversationId}/mark-seen`, {
+      method: 'POST',
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    const result = await response.json();
+    console.log('API: Mark conversation as seen response:', result);
+    
+    return result;
+  } catch (error) {
+    console.error('API: Error marking conversation as seen:', error);
+    return {
+      success: false,
+      message: 'Network error occurred'
     };
   }
 };

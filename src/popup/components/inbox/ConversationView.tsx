@@ -17,6 +17,7 @@ const ConversationView = ({ conversationId, onBack }: ConversationViewProps) => 
     loadMessages,
     messages,
     sendMessage,
+    markAsSeen,
     acceptMessageRequest,
     rejectMessageRequest
   } = useMessage();
@@ -30,11 +31,25 @@ const ConversationView = ({ conversationId, onBack }: ConversationViewProps) => 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await loadMessages(conversationId);
+      const hasUnreadMessages = !!(conversation && conversation.unreadCount > 0);
+      await loadMessages(conversationId, hasUnreadMessages);
       setLoading(false);
     };
     loadData();
-  }, [conversationId, loadMessages]);
+  }, [conversationId]);
+
+  useEffect(() => {
+    if (isPending || loading) return;
+    const hasUnreadMessages = conversation && conversation.unreadCount > 0;
+    if (hasUnreadMessages) {
+      const markAsSeenTimer = setTimeout(() => {
+        markAsSeen(conversationId);
+      }, 1000);
+
+      return () => clearTimeout(markAsSeenTimer);
+    }
+  }, [conversationId, markAsSeen, isPending, loading, conversation]);
+
 
   const handleAcceptRequest = async () => {
     try {
