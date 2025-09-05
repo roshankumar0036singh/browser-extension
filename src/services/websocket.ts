@@ -1,4 +1,5 @@
 import { publishActiveTab } from "./tabTracking";
+import { handleNewMessageNotification } from "./notifications";
 
 const BACKEND_URL = process.env.BACKEND_URL;
 const WS_URL = BACKEND_URL ? BACKEND_URL.replace(/^http/, 'ws') : "";
@@ -43,7 +44,7 @@ export async function initializeWebSocket() {
         }, 10000);
     };
 
-    ws.onmessage = (event) => {
+    ws.onmessage = async (event) => {
         try {
             const data = JSON.parse(event.data);
             
@@ -78,11 +79,22 @@ export async function initializeWebSocket() {
 
             if (data.type === 'NEW_MESSAGE') {
                 console.log('[WebSocket-extension] Received new message:', data);
-                chrome.runtime.sendMessage({
-                    type: 'NEW_MESSAGE',
-                    payload: data.data
-                }).catch((e) => {
-                    console.warn('[WebSocket-extension] Error sending NEW_MESSAGE message:', e);
+                
+                try {
+                    await chrome.runtime.sendMessage({
+                        type: 'NEW_MESSAGE',
+                        payload: data.data
+                    });
+                } catch (error) {
+                    console.warn('[WebSocket-extension] Popup not available for NEW_MESSAGE:', error);
+                }
+
+                await handleNewMessageNotification({
+                    senderId: data.data.senderId,
+                    senderName: data.data.sender?.displayName || data.data.sender?.username || 'Unknown',
+                    content: data.data.content,
+                    conversationId: data.data.conversationId,
+                    messageId: data.data.id
                 });
             }
         } catch (error) {
