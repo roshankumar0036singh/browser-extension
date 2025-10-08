@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { login } from '../../services/api';
 import { useAuth } from '../context/AuthContext';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 const LoginPage: React.FC = () => {
   const { login: authLogin } = useAuth();
@@ -81,31 +81,6 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="min-h-[600px] w-[400px] bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-      <Toaster 
-        position="top-center"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: '#363636',
-            color: '#fff',
-          },
-          success: {
-            duration: 3000,
-            iconTheme: {
-              primary: '#4ade80',
-              secondary: 'white',
-            },
-          },
-          error: {
-            duration: 4000,
-            iconTheme: {
-              primary: '#ef4444',
-              secondary: 'white',
-            },
-          },
-        }}
-      />
-      
       <div className="flex items-center mb-8">
         <a href="#/" className="text-blue-600 hover:text-blue-800 mr-4">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

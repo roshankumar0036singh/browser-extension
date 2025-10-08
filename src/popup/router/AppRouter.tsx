@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { FriendsProvider } from '../context/FriendsContext';
@@ -10,6 +10,7 @@ import AppLayout from '../components/layout/AppLayout';
 import WelcomeScreen from '../components/welcome/WelcomeScreen';
 import LoginPage from '../pages/LoginPage';
 import SignupPage from '../pages/SignupPage';
+import EmailVerificationPage from '../pages/EmailVerificationPage';
 
 // Main Pages
 import HomePage from '../pages/HomePage';
@@ -33,6 +34,27 @@ import { MessageProvider } from '../context/MessageContext';
 
 const AppRouter: React.FC = () => {
   const { user, loading } = useAuth();
+  const [verifiedEmail, setVerifiedEmail] = useState<string>('');
+
+  const handleEmailVerified = (email: string) => {
+    setVerifiedEmail(email);
+    window.location.hash = '#/signup';
+  };
+
+  React.useEffect(() => {
+    if (!user && !loading) {
+      const pendingEmail = localStorage.getItem('pendingVerificationEmail');
+      const currentHash = window.location.hash;
+      
+      if (pendingEmail && (currentHash === '#/' || currentHash === '' || currentHash === '#')) {
+        setTimeout(() => {
+          if (window.location.hash === '#/' || window.location.hash === '' || window.location.hash === '#') {
+            window.location.hash = '#/email-verification';
+          }
+        }, 200);
+      }
+    }
+  }, [user, loading]);
 
   if (loading) {
     return (
@@ -50,7 +72,8 @@ const AppRouter: React.FC = () => {
           <>
             <Route path="/" element={<WelcomeScreen />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/email-verification" element={<EmailVerificationPage onVerificationSuccess={handleEmailVerified}/>} />
+            <Route path="/signup" element={<SignupPage verifiedEmail={verifiedEmail} />} />
           </>
         )}
         

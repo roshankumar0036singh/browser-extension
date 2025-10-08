@@ -377,3 +377,54 @@ export const updateProfile = async (profileData: any, token: string) => {
   });
   return await response.json();
 };
+
+// OTP Email Verification APIs
+export const requestOTP = async (email: string) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/otp/request-otp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Request OTP error:', error);
+    throw error;
+  }
+};
+
+export const verifyOTP = async (email: string, otp: string) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/otp/verify-otp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, otp }),
+    });
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Verify OTP error:', error);
+    throw error;
+  }
+};
+
+export const checkEmailVerification = async (email: string) => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/otp/check-verification?email=${encodeURIComponent(email)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Check email verification error:', error);
+    throw error;
+  }
+};

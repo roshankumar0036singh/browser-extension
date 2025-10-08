@@ -1,24 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { signup } from '../../services/api';
 import { useAuth } from '../context/AuthContext';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
-const SignupPage: React.FC = () => {
+interface SignupPageProps {
+  verifiedEmail?: string;
+}
+
+const SignupPage: React.FC<SignupPageProps> = ({ verifiedEmail }) => {
   const { login } = useAuth();
   const [formData, setFormData] = useState({
     username: '',
     password: '',
     confirmPassword: '',
-    email: '',
+    email: verifiedEmail || '',
     displayName: ''
   });
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    if (verifiedEmail) {
+      setFormData(prev => ({
+        ...prev,
+        email: verifiedEmail
+      }));
+    }
+  }, [verifiedEmail]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    
+    if (name === 'email' && verifiedEmail) {
+      return;
+    }
+    
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -89,6 +107,11 @@ const SignupPage: React.FC = () => {
       });
       
       if (!response.success) {
+        if (response.error === 'Please verify your email before signing up') {
+          toast.error('Email verification required. Please verify your email first.');
+          window.location.href = '#/email-verification';
+          return;
+        }
         toast.error(response.error || 'Failed to create account');
         return;
       }
@@ -126,32 +149,6 @@ const SignupPage: React.FC = () => {
 
   return (
     <div className="min-h-[600px] w-[400px] bg-white p-6">
-      {/* Toast container */}
-      <Toaster 
-        position="top-center"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: '#363636',
-            color: '#fff',
-          },
-          success: {
-            duration: 3000,
-            iconTheme: {
-              primary: '#4ade80',
-              secondary: 'white',
-            },
-          },
-          error: {
-            duration: 4000,
-            iconTheme: {
-              primary: '#ef4444',
-              secondary: 'white',
-            },
-          },
-        }}
-      />
-      
       <div className="flex items-center mb-8">
         <a href="#/" className="text-blue-600 hover:text-blue-800 mr-4">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -179,7 +176,7 @@ const SignupPage: React.FC = () => {
         
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            Email*
+            Email* {verifiedEmail && <span className="text-green-600 text-sm">✓ Verified</span>}
           </label>
           <input
             type="email"
@@ -187,7 +184,8 @@ const SignupPage: React.FC = () => {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className={`w-full px-3 py-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500`}
+            readOnly={!!verifiedEmail}
+            className={`w-full px-3 py-2 border ${errors.email ? 'border-red-500' : verifiedEmail ? 'border-green-500 bg-green-50' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-2 ${verifiedEmail ? 'focus:ring-green-500' : 'focus:ring-blue-500'} ${verifiedEmail ? 'cursor-not-allowed' : ''}`}
             placeholder="Enter your email"
           />
         </div>
