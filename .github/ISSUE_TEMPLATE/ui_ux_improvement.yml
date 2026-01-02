@@ -1,0 +1,91 @@
+name: UI/UX Improvement
+description: Suggest improvements to the user interface or user experience
+title: "[UI/UX] "
+labels: ["enhancement", "ui/ux"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping us improve BrowsePing's user experience! Please describe your UI/UX suggestion below.
+
+  - type: textarea
+    id: current-design
+    attributes:
+      label: Current Design/Experience
+      description: Describe the current UI/UX that you think could be improved
+      placeholder: What currently exists and what's wrong with it?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-improvement
+    attributes:
+      label: Proposed Improvement
+      description: Describe how you would like the UI/UX to be improved
+      placeholder: What would make it better?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Which Component/Area?
+      description: Where in the extension is this improvement needed?
+      options:
+        - Extension Popup
+        - Navigation/Menu
+        - Friends List
+        - Messaging/Inbox
+        - Analytics Dashboard
+        - Profile Page
+        - Settings
+        - Notifications
+        - Leaderboard
+        - Other/Multiple Areas
+    validations:
+      required: true
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: Mockups or Examples
+      description: If applicable, add mockups, screenshots, or examples from other apps
+      placeholder: Drag and drop images or paste URLs here
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: User Impact
+      description: How much would this improvement impact users?
+      options:
+        - Minor enhancement
+        - Moderate improvement
+        - Major usability issue
+    validations:
+      required: true
+
+  - type: textarea
+    id: user-benefit
+    attributes:
+      label: User Benefit
+      description: How would this improvement benefit users?
+      placeholder: Explain the value to users...
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other context, user feedback, or information
+      placeholder: Additional details...
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before Submitting
+      options:
+        - label: I have searched existing issues for similar suggestions
+          required: true
+        - label: This is focused on UI/UX (not a new feature request)
+          required: true

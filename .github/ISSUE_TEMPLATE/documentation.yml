@@ -1,0 +1,104 @@
+name: Documentation Improvement
+description: Suggest improvements to documentation (README, guides, code comments, etc.)
+title: "[DOCS] "
+labels: ["documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping us improve BrowsePing's documentation! Clear docs make the project accessible to everyone.
+
+  - type: dropdown
+    id: doc-type
+    attributes:
+      label: Type of Documentation
+      description: What kind of documentation needs improvement?
+      options:
+        - README
+        - CONTRIBUTING.md
+        - SECURITY.md
+        - CODE_OF_CONDUCT.md
+        - CHANGELOG.md
+        - Code comments/inline documentation
+        - Installation guide
+        - Development setup guide
+        - API documentation
+        - User guide/tutorials
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-state
+    attributes:
+      label: Current State
+      description: What's currently in the documentation (or missing)?
+      placeholder: Quote or describe the current documentation...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-improvement
+    attributes:
+      label: Proposed Improvement
+      description: How should the documentation be improved?
+      placeholder: What should be added, changed, or clarified?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue Type
+      description: What kind of documentation issue is this?
+      options:
+        - Missing information
+        - Incorrect/outdated information
+        - Unclear/confusing explanation
+        - Typo/grammar
+        - Needs examples
+        - Needs visuals/diagrams
+        - Better organization needed
+        - Translation needed
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: affected-users
+    attributes:
+      label: Who Would Benefit?
+      description: Who would benefit from this documentation improvement?
+      placeholder: |
+        - New contributors
+        - End users
+        - Developers integrating with the API
+        - etc.
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggested-content
+    attributes:
+      label: Suggested Content (Optional)
+      description: If you have specific wording or content to suggest, include it here
+      placeholder: Provide the improved documentation text...
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other relevant information
+      placeholder: Links to good examples, related issues, etc.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before Submitting
+      options:
+        - label: I have reviewed the existing documentation
+          required: true
+        - label: I have checked this isn't already being addressed
+          required: true
+        - label: I'm willing to help write/improve this documentation
+          required: false

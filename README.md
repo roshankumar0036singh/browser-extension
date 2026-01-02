@@ -1,97 +1,128 @@
-<p align="center">
-  <img src="https://avatars.githubusercontent.com/u/218343412?s=48&v=4" alt="BrowsePing Browser Extension">
-</p>
-
 # BrowsePing Browser Extension
 
-[![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/browseping/browser-extension?include_prereleases)](https://img.shields.io/github/v/release/browseping/browser-extension?include_prereleases)
-[![GitHub last commit](https://img.shields.io/github/last-commit/browseping/browser-extension)](https://img.shields.io/github/last-commit/browseping/browser-extension)
-[![GitHub issues](https://img.shields.io/github/issues-raw/browseping/browser-extension)](https://img.shields.io/github/issues-raw/browseping/browser-extension)
-[![GitHub pull requests](https://img.shields.io/github/issues-pr/browseping/browser-extension)](https://img.shields.io/github/issues-pr/browseping/browser-extension)
-[![GitHub](https://img.shields.io/github/license/browseping/browser-extension)](https://img.shields.io/github/license/browseping/browser-extension)
+## Overview
 
-A simple web browser extension built with React, TypeScript, Webpack and Tailwind CSS that socializes your browsing experience.
+BrowsePing is an open-source browser extension that transforms your solitary browsing into a vibrant social experience. Connect with friends, share your digital presence, and discover what's capturing everyone's attention across the web. Make your browsing more insightful with comprehensive analytics, real-time presence tracking, and meaningful social interactions.
 
-# Table of Contents
+### Key Features
 
-This is a table of contents for Browseping Browser Extensions. It helps you to navigate through the README quickly.
-- [BrowsePing Browser Extension](https://www.browseping.com/)
-- [Table of Contents](#table-of-contents)
-- [Marketplace Link](#marketplace-link)
-- [Technologies](#technologies)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contribute](#contribute)
-- [Community & Support](#community-and-support)
-- [License](#license)
+- **Social Presence**: See what your friends are browsing in real-time and connect over shared interests
+- **Advanced Analytics**: Track your browsing habits with detailed insights including hourly presence, tab usage, and productivity metrics
+- **Friend System**: Add friends, send messages, and engage in meaningful conversations about your online discoveries
+- **Privacy First**: Full control over your data with customizable privacy settings
+- **Real-time Messaging**: Built-in inbox to chat with your network
+- **Leaderboard**: Friendly competition to see who's the most active browser
 
-## Marketplace Link
-- To download the browseping-browser extension with Google Chrome: [Google Chrome Download Extension](https://chromewebstore.google.com/detail/browseping/lkcmcldjgmbojnhepnhegkmddfempmcd)
-- To download the browseping-browser extension with Microsoft Edge: [Microsoft Edge Download Extension](https://microsoftedge.microsoft.com/addons/detail/browseping/jhdfmcopfogjnbapgfgddjiokgkllgpa)
-- To download the browseping-browser extension with Brave (Uses Google Chrome Store): [Brave Download Extensions](https://chromewebstore.google.com/detail/browseping/lkcmcldjgmbojnhepnhegkmddfempmcd)
-- To download the browseping-browser extension with Opera (Available on Opera Add-ons): [Opera Download Extensions](https://chromewebstore.google.com/detail/browseping/lkcmcldjgmbojnhepnhegkmddfempmcd)
-  
-## Technologies
+Learn more at [browseping.com](https://www.browseping.com)
 
-- [React](https://react.dev/)
-- [Typescript](https://www.typescriptlang.org/)
-- [Tailwind CSS](https://tailwindcss.com/) 
-- [Webpack](https://webpack.js.org/)
+## Download
 
-## Features
-- **Social Browsing:** Experience browsing like never before with our social features. Real-time friend presence tracking, shared bookmarks, and collaborative browsing sessions that bring people together across the web.
-- **Advance Analytics:** Comprehensive analytics dashboard with detailed insights into your digital habits. Track time spent, identify patterns, and optimize your online productivity with beautiful visualizations..
-- **Monthly Leaderboard:** Turn browsing into a fun competition with monthly leaderboards. Compete with friends, earn achievements, and see how your browsing habits stack up in a gamified environment.
-- **Direct Messaging:** Seamless communication without interrupting your browsing flow. Send quick messages, share interesting links, and coordinate browsing sessions with friends directly from the extension.
-- **Smart Notifications:** Intelligent notification system that keeps you connected without being intrusive. Customizable alerts for friend activities, new messages, and important updates with smart priority management.
-- **Privacy First:** Complete control over your privacy with granular settings. Choose what to share, with whom, and when. Your data stays secure with end-to-end encryption and transparent policies.
-- **Websocket Real-time:** Ultra-fast real-time synchronization powered by WebSocket technology. Experience instant updates for friend activities, messages, and presence status with minimal latency.
-- **Open Source:** Built by the community, for the community. Completely open-source with transparent development, extensible architecture, and welcoming contribution guidelines for developers of all levels.
-- **Session Tracking:** Comprehensive session management with automatic tracking of browsing habits. Gain insights into your digital wellness and optimize your time with detailed session analytics.
+- **Chrome Web Store**: [Install BrowsePing](https://chromewebstore.google.com/detail/browseping/lkcmcldjgmbojnhepnhegkmddfempmcd)
+- **Microsoft Edge Add-ons**: [Install BrowsePing](https://microsoftedge.microsoft.com/addons/detail/browseping)
 
-# Installation
+Compatible with Chrome, Edge, Brave, Opera, and other Chromium-based browsers.
 
+## Installation for Development
 
-```bash
-# Install dependencies
-npm install
+### Setup Steps
 
-# Build the extension for development
-npm run dev
-```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/browseping/browser-extension.git
+   cd browser-extension
+   ```
 
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-# Usage
+3. **Configure environment variables**
+   
+   Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
+
+   Edit the `.env` file to configure your backend URL:
+   
+   - **For production testing** (default): Keep `BACKEND_URL=https://api.browseping.com`
+   - **For local development**: Use the [browseping/server](https://github.com/browseping/server) repository and update `.env`: `BACKEND_URL=http://localhost:3000`
+
+4. **Start development mode**
+   ```bash
+   npm run dev
+   ```
+
+5. **Load the extension in your browser**
+   
+   - Open Chrome/Edge and navigate to `chrome://extensions/` (or `edge://extensions/`)
+   - Enable **Developer mode** (toggle in the top right)
+   - Click **Load unpacked**
+   - Select the `dist` directory from your project folder
+   
+   The extension is now loaded! Any code changes will trigger automatic rebuilds (you may need to reload the extension to see changes).
+
+## Scripts
+
+The project includes the following npm scripts:
+
+- **`npm run dev`**: Runs webpack in watch mode for development. This continuously rebuilds the extension as you make changes to the code, making it ideal for development.
+
+- **`npm run build`**: Builds the extension for production. This creates optimized files in the `dist` directory ready for distribution.
+
+## Development Workflow
 
 1. Run `npm run dev` to start the development build process
 2. Load the extension from the `dist` folder into your browser:
-   - Open Chrome/Edge and navigate to `chrome://extensions/`
-   - Enable "Developer mode"
-   - Click "Load unpacked" and select the `dist` directory
+   - Open Chrome/Edge and navigate to `chrome://extensions/` (or `edge://extensions/`)
+   - Enable **Developer mode**
+   - Click **Load unpacked** and select the `dist` directory
+3. Make changes to the code - the extension will automatically rebuild
+4. Reload the extension in your browser to see changes (click the refresh icon on the extension card)
 
-After making changes to the code, the extension will automatically rebuild. You may need to reload the extension in your browser to see changes.
+## Project Structure
 
+```
+browser-extension/
+├── src/
+│   ├── background/       # Background service worker
+│   ├── popup/           # Extension popup UI
+│   │   ├── components/  # React components
+│   │   ├── context/     # React context providers
+│   │   ├── pages/       # Page components
+│   │   └── utils/       # Utility functions
+│   └── services/        # API and service integrations
+├── public/              # Static assets
+├── dist/                # Built extension files
+└── manifest.json        # Extension manifest
+```
 
-# Contribute
+## Contributing
 
-Before contributing, please follow these guidelines:
+We welcome contributions! BrowsePing is an open-source project and we'd love your help in making it better. Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on how to get started.
 
-- **Fork this repository** and clone it to your machine.
-- **Create a new branch** for your feature/fix.
-- **Describe the issue properly** in your PR and reference the issue number.
-- **Follow the existing code style** and test your changes.
-- **Update documentation** if you add new features.
-- **One feature per PR** and be respectful to other contributors.
+Join our community on [Discord](https://discord.gg/GdhXuEAZ) to discuss ideas, ask questions, and collaborate with other contributors.
 
+Visit our [GitHub organization](https://github.com/browseping) to explore more repositories and contribute.
 
-## Community And Support
-- **Questions?** Open an issue with the `question` label
-- **Bug Reports:** Use the `bug` label when creating issues
-- **Feature Requests:** Use the `feature` label
+## Support
 
+- **Help Center**: [browseping.com/help](https://www.browseping.com/help)
+- **Contact Us**: [browseping.com/contact](https://www.browseping.com/contact)
+- **Email**: [support@browseping.com](mailto:support@browseping.com)
 
-# License
+## License
 
-This project is open-source and available under the [MIT License](https://github.com/browseping/browser-extension/blob/main/LICENSE).
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## Community & Links
+
+### Connect With Us
+
+- **Discord**: [Join our community](https://discord.gg/GdhXuEAZ)
+- **Twitter/X**: [@BrowsePing](https://x.com/browseping)
+- **LinkedIn**: [BrowsePing Company](https://www.linkedin.com/company/browseping)
+- **GitHub**: [github.com/browseping](https://github.com/browseping)
+
+---
