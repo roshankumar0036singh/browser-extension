@@ -126,3 +126,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **GitHub**: [github.com/browseping](https://github.com/browseping)
 
 ---
+## Contributors
+
+Thanks to all the wonderful people who have contributed to this project.
+
+<a href="https://github.com/browseping/browser-extension/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=browseping/browser-extension" />
+</a>
