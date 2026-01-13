@@ -10,8 +10,14 @@ module.exports = {
   mode: process.env.NODE_ENV || 'development',
   devtool: process.env.NODE_ENV === 'production' ? false : 'inline-source-map',
   entry: {
-    popup: path.resolve(__dirname, 'src', 'popup', 'index.tsx'),
-    background: path.resolve(__dirname, 'src', 'background', 'index.ts')
+    popup: [
+      'webextension-polyfill',
+      path.resolve(__dirname, 'src', 'popup', 'index.tsx')
+    ],
+    background: [
+      'webextension-polyfill',
+      path.resolve(__dirname, 'src', 'background', 'index.ts')
+    ]
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -51,13 +57,28 @@ module.exports = {
     }),
     new CopyWebpackPlugin({
       patterns: [
-        { 
+        {
           from: path.resolve(__dirname, 'public'),
           to: path.resolve(__dirname, 'dist')
         },
         {
           from: path.resolve(__dirname, 'manifest.json'),
-          to: path.resolve(__dirname, 'dist')
+          to: path.resolve(__dirname, 'dist'),
+          transform(content) {
+            const manifest = JSON.parse(content.toString());
+
+            // Add Firefox-specific settings
+            if (process.env.TARGET_BROWSER === 'firefox') {
+              manifest.browser_specific_settings = {
+                gecko: {
+                  id: 'browseping@example.com',
+                  strict_min_version: '109.0'
+                }
+              };
+            }
+
+            return JSON.stringify(manifest, null, 2);
+          }
         }
       ]
     }),

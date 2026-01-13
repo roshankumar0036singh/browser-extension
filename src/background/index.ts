@@ -37,7 +37,7 @@ chrome.runtime.onStartup.addListener(() => {
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === 'LOGIN_SUCCESS'){
+  if (message.type === 'LOGIN_SUCCESS') {
     initializeWebSocket();
     startReconnectLoop();
   } else if (message.type === 'LOGOUT') {
