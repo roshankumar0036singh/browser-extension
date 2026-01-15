@@ -75,6 +75,12 @@ module.exports = {
                   strict_min_version: '109.0'
                 }
               };
+              // Use background scripts for Firefox if service workers are problematic
+              if (manifest.background && manifest.background.service_worker) {
+                manifest.background.scripts = [manifest.background.service_worker];
+                delete manifest.background.service_worker;
+                delete manifest.background.type;
+              }
             }
 
             return JSON.stringify(manifest, null, 2);
